@@ -62,6 +62,14 @@ class TestTransactionLoader(unittest.TestCase):
         for item in baskets[0]:
             self.assertIsInstance(item, str)
 
+    def test_missing_file_raises_file_not_found(self):
+        """FR1-T0: Missing CSV path raises FileNotFoundError."""
+        from src.transaction_loader import TransactionLoader
+        loader = TransactionLoader()
+
+        with self.assertRaises(FileNotFoundError):
+            loader.load_from_csv("does_not_exist.csv")
+
     def test_grouping_by_member_and_date(self):
         """FR1-T2: Items grouped by (Member_number, Date) produce correct baskets."""
         # Arrange
