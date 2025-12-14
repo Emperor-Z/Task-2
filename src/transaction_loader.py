@@ -31,4 +31,14 @@ class TransactionLoader:
                 missing = required_columns - set(reader.fieldnames or [])
                 raise ValueError(f"CSV missing required column: {missing}")
 
-            return []
+            baskets_dict = defaultdict(list)
+
+            for row in reader:
+                member_number = row["Member_number"]
+                date = row["Date"]
+                item = row["itemDescription"]
+
+                key = (member_number, date)
+                baskets_dict[key].append(item)
+
+            return [list(items) for items in baskets_dict.values()]
