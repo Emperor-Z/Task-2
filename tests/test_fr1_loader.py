@@ -82,6 +82,20 @@ class TestTransactionLoader(unittest.TestCase):
         with self.assertRaises(ValueError):
             loader.load_from_csv(csv_path)
 
+    def test_load_returns_list_of_baskets(self):
+        """FR1-T1a: load_from_csv returns list of basket lists."""
+        csv_content = """Member_number,Date,itemDescription
+1808,21-07-2015,bread"""
+        csv_path = self._write_csv(csv_content)
+
+        from src.transaction_loader import TransactionLoader
+        loader = TransactionLoader()
+
+        baskets = loader.load_from_csv(csv_path)
+
+        self.assertIsInstance(baskets, list)
+        self.assertIsInstance(baskets[0], list)
+
     def test_grouping_by_member_and_date(self):
         """FR1-T2: Items grouped by (Member_number, Date) produce correct baskets."""
         # Arrange
