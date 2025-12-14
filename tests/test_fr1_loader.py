@@ -70,6 +70,18 @@ class TestTransactionLoader(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             loader.load_from_csv("does_not_exist.csv")
 
+    def test_missing_required_columns_raise_value_error(self):
+        """FR1-T0b: Missing required CSV columns raises ValueError."""
+        csv_content = """Member_number,itemDescription
+1808,bread"""
+        csv_path = self._write_csv(csv_content)
+
+        from src.transaction_loader import TransactionLoader
+        loader = TransactionLoader()
+
+        with self.assertRaises(ValueError):
+            loader.load_from_csv(csv_path)
+
     def test_grouping_by_member_and_date(self):
         """FR1-T2: Items grouped by (Member_number, Date) produce correct baskets."""
         # Arrange
