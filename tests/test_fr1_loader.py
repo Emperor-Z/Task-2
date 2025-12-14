@@ -213,6 +213,19 @@ class TestTransactionLoader(unittest.TestCase):
         expected = ["bread", "eggs", "milk"]
         self.assertEqual(basket, expected, "Items must be sorted alphabetically")
 
+    def test_items_sorted_even_if_inserted_unsorted(self):
+        """FR1-T5a: Sorting applied regardless of input order."""
+        csv_content = """Member_number,Date,itemDescription
+1808,21-07-2015,zebra
+1808,21-07-2015,apple"""
+        csv_path = self._write_csv(csv_content)
+
+        from src.transaction_loader import TransactionLoader
+        loader = TransactionLoader()
+        baskets = loader.load_from_csv(csv_path)
+
+        self.assertEqual(baskets[0], ["apple", "zebra"])
+
     def test_whitespace_trimmed(self):
         """FR1-T6: Leading/trailing whitespace is removed from item names."""
         # Arrange
