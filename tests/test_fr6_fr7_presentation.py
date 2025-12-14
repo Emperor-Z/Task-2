@@ -132,6 +132,12 @@ class TestBFSExploration(unittest.TestCase):
         # Should complete and return a dict
         self.assertIsInstance(result, dict)
 
+    def test_bfs_unknown_start_returns_empty_levels(self):
+        """FR7-T0: Starting from missing node yields empty mapping."""
+        result = self.service.bfs_related("unknown", max_depth=2, min_weight=1)
+
+        self.assertEqual(result, {"unknown": {}})
+
 
 if __name__ == '__main__':
     unittest.main()
