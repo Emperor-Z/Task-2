@@ -22,7 +22,18 @@ class Presenter:
         Returns:
             Formatted text string (suitable for CLI output)
         """
-        raise NotImplementedError("format_top_bundles not implemented yet")
+        if not bundles:
+            return "No bundles found."
+
+        lines = ["=" * 60, "TOP PRODUCT BUNDLES (Item Pairs)", "=" * 60]
+        lines.append(f"{'Rank':<6} {'Item 1':<20} {'Item 2':<20} {'Frequency':<8}")
+        lines.append("-" * 60)
+
+        for rank, (item_a, item_b, freq) in enumerate(bundles, 1):
+            lines.append(f"{rank:<6} {item_a:<20} {item_b:<20} {freq:<8}")
+
+        lines.append("=" * 60)
+        return "\n".join(lines)
 
     @staticmethod
     def format_recommendations(items: List[Tuple[str, int]], item_name: str) -> str:
