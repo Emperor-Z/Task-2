@@ -36,7 +36,10 @@ class TransactionLoader:
             for row in reader:
                 member_number = row["Member_number"]
                 date = row["Date"]
-                item = row["itemDescription"]
+                item = (row["itemDescription"] or "").strip()
+
+                if not item:
+                    continue
 
                 key = (member_number, date)
                 baskets_dict[key].add(item)
