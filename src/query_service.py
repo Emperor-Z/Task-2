@@ -40,7 +40,7 @@ class QueryService:
         Returns:
             Number of times items were co-purchased (0 if never)
         """
-        return self.graph.get_weight(item_a, item_b)
+        raise NotImplementedError("pair_frequency not implemented yet")
 
     def often_copurchased(self, item_a: str, item_b: str, threshold: int) -> bool:
         """Check if two items are often co-purchased (above threshold).
@@ -53,8 +53,7 @@ class QueryService:
         Returns:
             True if items co-purchased >= threshold times, False otherwise
         """
-        frequency = self.pair_frequency(item_a, item_b)
-        return frequency >= threshold
+        raise NotImplementedError("often_copurchased not implemented yet")
 
     # ========== FR5: Top-K Items Bought with Item ==========
 
@@ -75,19 +74,7 @@ class QueryService:
             1. Frequency descending
             2. Item name alphabetically (tie-breaker)
         """
-        # Get all neighbors of the item
-        neighbors = self.graph.neighbors(item)
-        
-        if not neighbors:
-            return []
-        
-        # Sort by: frequency (desc), then alphabetically
-        sorted_items = sorted(
-            neighbors.items(),
-            key=lambda x: (-x[1], x[0])  # (-frequency, name)
-        )
-        
-        return sorted_items[:k]
+        raise NotImplementedError("top_with_item not implemented yet")
 
     # ========== FR4: Top-K Bundles (Pairs) Globally ==========
 
@@ -108,19 +95,7 @@ class QueryService:
             sorted by: 1. Frequency descending
                       2. Item names alphabetically (tie-breaker)
         """
-        # Get all unique edges from graph
-        edges = self.graph.unique_edges()
-        
-        if not edges:
-            return []
-        
-        # Sort by: frequency (desc), then alphabetically (item_a, then item_b)
-        sorted_edges = sorted(
-            edges,
-            key=lambda x: (-x[2], x[0], x[1])  # (-frequency, item_a, item_b)
-        )
-        
-        return sorted_edges[:k]
+        raise NotImplementedError("top_bundles not implemented yet")
 
     # ========== FR7: BFS Exploration ==========
 
@@ -153,42 +128,4 @@ class QueryService:
                 }
             }
         """
-        if start_item not in self.graph.graph:
-            return {start_item: {}}
-        
-        result = {start_item: {}}
-        visited = {start_item}
-        queue = deque([(start_item, 0)])  # (item, depth)
-        
-        while queue:
-            current_item, current_depth = queue.popleft()
-            
-            # Stop exploring if reached max depth
-            if current_depth >= max_depth:
-                continue
-            
-            # Get neighbors of current item
-            neighbors = self.graph.neighbors(current_item)
-            
-            for neighbor_item, weight in neighbors.items():
-                # Skip if already visited
-                if neighbor_item in visited:
-                    continue
-                
-                # Skip if weight below threshold
-                if weight < min_weight:
-                    continue
-                
-                # Mark as visited
-                visited.add(neighbor_item)
-                
-                # Record at this depth
-                next_depth = current_depth + 1
-                if next_depth not in result[start_item]:
-                    result[start_item][next_depth] = set()
-                result[start_item][next_depth].add(neighbor_item)
-                
-                # Add to queue for exploration
-                queue.append((neighbor_item, next_depth))
-        
-        return result
+        raise NotImplementedError("bfs_related not implemented yet")

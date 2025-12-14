@@ -22,20 +22,7 @@ class Presenter:
         Returns:
             Formatted text string (suitable for CLI output)
         """
-        if not bundles:
-            return "No bundles found."
-        
-        lines = ["=" * 60]
-        lines.append("TOP PRODUCT BUNDLES (Item Pairs)")
-        lines.append("=" * 60)
-        lines.append(f"{'Rank':<6} {'Item 1':<20} {'Item 2':<20} {'Frequency':<8}")
-        lines.append("-" * 60)
-        
-        for rank, (item_a, item_b, freq) in enumerate(bundles, 1):
-            lines.append(f"{rank:<6} {item_a:<20} {item_b:<20} {freq:<8}")
-        
-        lines.append("=" * 60)
-        return "\n".join(lines)
+        raise NotImplementedError("format_top_bundles not implemented yet")
 
     @staticmethod
     def format_recommendations(items: List[Tuple[str, int]], item_name: str) -> str:
@@ -48,20 +35,7 @@ class Presenter:
         Returns:
             Formatted text string (suitable for CLI output)
         """
-        if not items:
-            return f"No items found to recommend with '{item_name}'."
-        
-        lines = ["=" * 60]
-        lines.append(f"TOP ITEMS BOUGHT WITH: {item_name.upper()}")
-        lines.append("=" * 60)
-        lines.append(f"{'Rank':<6} {'Item':<30} {'Co-Purchases':<8}")
-        lines.append("-" * 60)
-        
-        for rank, (item, freq) in enumerate(items, 1):
-            lines.append(f"{rank:<6} {item:<30} {freq:<8}")
-        
-        lines.append("=" * 60)
-        return "\n".join(lines)
+        raise NotImplementedError("format_recommendations not implemented yet")
 
     @staticmethod
     def format_pair(item_a: str, item_b: str, weight: int) -> str:
@@ -75,4 +49,4 @@ class Presenter:
         Returns:
             Formatted string
         """
-        return f"{item_a} + {item_b}: {weight} co-purchases"
+        raise NotImplementedError("format_pair not implemented yet")

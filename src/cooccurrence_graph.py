@@ -24,29 +24,8 @@ class CooccurrenceGraph:
         self.graph: Dict[str, Dict[str, int]] = {}
 
     def update_from_basket(self, basket: List[str]) -> None:
-        """Update graph with co-occurrences from one basket (transaction).
-        
-        For each pair (item_a, item_b) in basket where item_a != item_b:
-        - Increment weight in both directions (undirected)
-        
-        Args:
-            basket: List of items purchased together (should be sorted)
-        """
-        # Generate all unique pairs (avoid duplicates and self-edges)
-        for i in range(len(basket)):
-            for j in range(i + 1, len(basket)):
-                item_a = basket[i]
-                item_b = basket[j]
-                
-                # Ensure items exist in graph
-                if item_a not in self.graph:
-                    self.graph[item_a] = {}
-                if item_b not in self.graph:
-                    self.graph[item_b] = {}
-                
-                # Increment both directions (undirected graph)
-                self.graph[item_a][item_b] = self.graph[item_a].get(item_b, 0) + 1
-                self.graph[item_b][item_a] = self.graph[item_b].get(item_a, 0) + 1
+        """Update graph with co-occurrences from one basket (transaction)."""
+        raise NotImplementedError("update_from_basket not implemented yet")
 
     def get_weight(self, item_a: str, item_b: str) -> int:
         """Get co-purchase frequency for pair (item_a, item_b).
@@ -58,9 +37,7 @@ class CooccurrenceGraph:
         Returns:
             Number of times items were co-purchased (0 if never/not exist)
         """
-        if item_a not in self.graph:
-            return 0
-        return self.graph[item_a].get(item_b, 0)
+        raise NotImplementedError("get_weight not implemented yet")
 
     def neighbors(self, item: str) -> Dict[str, int]:
         """Get all items bought with a given item and their co-purchase counts.
@@ -72,7 +49,7 @@ class CooccurrenceGraph:
             Dictionary mapping neighbor items to co-purchase frequency.
             Empty dict if item not in graph.
         """
-        return self.graph.get(item, {})
+        raise NotImplementedError("neighbors not implemented yet")
 
     def unique_edges(self) -> List[Tuple[str, str, int]]:
         """Return all unique edges in graph (avoiding A-B and B-A duplicates).
@@ -81,17 +58,4 @@ class CooccurrenceGraph:
             List of (item_a, item_b, weight) tuples where item_a < item_b (lexicographic).
             This ensures each pair appears only once (no duplicates).
         """
-        edges = []
-        seen = set()
-        
-        for item_a in self.graph:
-            for item_b, weight in self.graph[item_a].items():
-                # Create canonical pair (smaller < larger) to avoid duplicates
-                pair = tuple(sorted([item_a, item_b]))
-                
-                if pair not in seen:
-                    seen.add(pair)
-                    # Always use lexicographic order (a < b)
-                    edges.append((pair[0], pair[1], weight))
-        
-        return edges
+        raise NotImplementedError("unique_edges not implemented yet")
