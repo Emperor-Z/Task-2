@@ -100,7 +100,12 @@ class QueryService:
             sorted by: 1. Frequency descending
                       2. Item names alphabetically (tie-breaker)
         """
-        raise NotImplementedError("top_bundles not implemented yet")
+        edges = self.graph.unique_edges()
+        if not edges:
+            return []
+
+        sorted_edges = sorted(edges, key=lambda x: (-x[2], x[0], x[1]))
+        return sorted_edges[:k]
 
     # ========== FR7: BFS Exploration ==========
 
