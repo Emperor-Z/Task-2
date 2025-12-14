@@ -64,6 +64,14 @@ class TestPresenter(unittest.TestCase):
         self.assertTrue(len(bundles_output) > 0)
         self.assertTrue(len(items_output) > 0)
 
+    def test_format_pair_outputs_string(self):
+        """FR6-T4: format_pair returns a descriptive string."""
+        text = self.presenter.format_pair("bread", "milk", 2)
+
+        self.assertIsInstance(text, str)
+        self.assertIn("bread", text)
+        self.assertIn("milk", text)
+
 
 class TestBFSExploration(unittest.TestCase):
     """Test cases for BFS relationship exploration."""
