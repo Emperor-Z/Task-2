@@ -40,7 +40,7 @@ class QueryService:
         Returns:
             Number of times items were co-purchased (0 if never)
         """
-        raise NotImplementedError("pair_frequency not implemented yet")
+        return self.graph.get_weight(item_a, item_b)
 
     def often_copurchased(self, item_a: str, item_b: str, threshold: int) -> bool:
         """Check if two items are often co-purchased (above threshold).
