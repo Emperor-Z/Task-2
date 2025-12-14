@@ -53,7 +53,7 @@ class QueryService:
         Returns:
             True if items co-purchased >= threshold times, False otherwise
         """
-        raise NotImplementedError("often_copurchased not implemented yet")
+        return self.pair_frequency(item_a, item_b) >= threshold
 
     # ========== FR5: Top-K Items Bought with Item ==========
 
