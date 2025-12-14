@@ -46,7 +46,18 @@ class Presenter:
         Returns:
             Formatted text string (suitable for CLI output)
         """
-        raise NotImplementedError("format_recommendations not implemented yet")
+        if not items:
+            return f"No items found to recommend with '{item_name}'."
+
+        lines = ["=" * 60, f"TOP ITEMS BOUGHT WITH: {item_name.upper()}", "=" * 60]
+        lines.append(f"{'Rank':<6} {'Item':<30} {'Co-Purchases':<8}")
+        lines.append("-" * 60)
+
+        for rank, (item, freq) in enumerate(items, 1):
+            lines.append(f"{rank:<6} {item:<30} {freq:<8}")
+
+        lines.append("=" * 60)
+        return "\n".join(lines)
 
     @staticmethod
     def format_pair(item_a: str, item_b: str, weight: int) -> str:
