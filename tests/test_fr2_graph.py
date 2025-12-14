@@ -42,6 +42,15 @@ class TestCooccurrenceGraph(unittest.TestCase):
         self.assertIn("bread", graph.graph)
         self.assertIn("milk", graph.graph)
 
+    def test_update_sets_weight_for_pair(self):
+        """FR2-T1c: update_from_basket sets weight to 1 for new pair."""
+        from src.cooccurrence_graph import CooccurrenceGraph
+        graph = CooccurrenceGraph()
+
+        graph.update_from_basket(["bread", "milk"])
+
+        self.assertEqual(graph.get_weight("bread", "milk"), 1)
+
     def test_basket_increments_both_directions(self):
         """FR2-T2: Basket [A, B] increments both A→B and B→A (symmetry)."""
         # Arrange
