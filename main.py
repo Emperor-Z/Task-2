@@ -86,31 +86,60 @@ def prompt_choose_item(matches, search_term):
         search_term: Original search term
         
     Returns:
-        Selected item name or None if user cancels
+        Selected item name, None if cancelled, or list of all items for aggregation
     """
     print(f"\n📋 Found {len(matches)} items matching '{search_term}':\n")
     
     for i, item in enumerate(matches, 1):
         print(f"  {i}. {item}")
     
+    print(f"  all. Show results for ALL items")
     print(f"  0. Cancel\n")
     
     while True:
         try:
-            choice = input("Select item number: ").strip()
-            choice_num = int(choice)
+            choice = input("Select item number (or 'all'): ").strip().lower()
             
-            if choice_num == 0:
+            if choice == "0" or choice == "cancel":
                 print("❌ Cancelled")
                 return None
-            elif 1 <= choice_num <= len(matches):
-                selected = matches[choice_num - 1]
-                logger.info(f"User selected: {selected} (from {len(matches)} matches for '{search_term}')")
-                return selected
+            elif choice == "all":
+                logger.info(f"User selected: ALL (aggregated {len(matches)} matches for '{search_term}')")
+                return matches  # Return list to indicate aggregation mode
             else:
-                print(f"❌ Please enter 0-{len(matches)}")
+                choice_num = int(choice)
+                if 1 <= choice_num <= len(matches):
+                    selected = matches[choice_num - 1]
+                    logger.info(f"User selected: {selected} (from {len(matches)} matches for '{search_term}')")
+                    return selected
+                else:
+                    print(f"❌ Please enter 1-{len(matches)}, 'all', or 0")
         except ValueError:
-            print("❌ Please enter a valid number")
+            print(f"❌ Please enter 1-{len(matches)}, 'all', or 0")
+
+
+def aggregate_top_items(query_service, graph, items, k):
+    """Aggregate top items bought with multiple items combined.
+    
+    Args:
+        query_service: QueryService instance
+        graph: CooccurrenceGraph instance
+        items: List of item names to aggregate
+        k: Number of top items to return
+        
+    Returns:
+        List of (item, total_weight) tuples sorted by weight
+    """
+    # Collect all co-purchases for all items
+    all_pairs = {}
+    for item in items:
+        neighbors = graph.neighbors(item)
+        for neighbor, weight in neighbors.items():
+            all_pairs[neighbor] = all_pairs.get(neighbor, 0) + weight
+    
+    # Sort by weight and return top k
+    sorted_pairs = sorted(all_pairs.items(), key=lambda x: x[1], reverse=True)
+    return sorted_pairs[:k]
 
 
 def list_available_items(graph):
@@ -139,16 +168,24 @@ def query_top_items(query_service, graph, presenter):
     
     if isinstance(result, list):
         # Multiple matches - let user choose
-        item = prompt_choose_item(result, item_search)
-        if item is None:
+        choice = prompt_choose_item(result, item_search)
+        if choice is None:
             return
+        # Check if user selected "all" (returns list) or single item (returns string)
+        if isinstance(choice, list):
+            items = choice
+            is_aggregated = True
+        else:
+            items = [choice]
+            is_aggregated = False
     elif result is None:
         print(f"❌ '{item_search}' not found in dataset")
         logger.warning(f"Item not found: {item_search}")
         return
     else:
         # Single exact match
-        item = result
+        items = [result]
+        is_aggregated = False
 
     try:
         k = int(input("How many top items? (default 10): ") or "10")
@@ -159,15 +196,32 @@ def query_top_items(query_service, graph, presenter):
         print("❌ Invalid number")
         return
 
-    results = query_service.top_with_item(item, k)
-    if not results:
-        print(f"❌ No items found co-purchased with '{item}'")
-        logger.info(f"Query: top_with_item('{item}', {k}) - No results")
-        return
-
-    output = presenter.format_recommendations(results, item)
-    print("\n" + output)
-    logger.info(f"Query: top_with_item('{item}', {k}) - {len(results)} results")
+    # Handle aggregated or single item query
+    if is_aggregated:
+        results = aggregate_top_items(query_service, graph, items, k)
+        item_names_str = ", ".join(items)
+        print(f"\n{'='*60}")
+        print(f"TOP {k} ITEMS BOUGHT WITH: {item_names_str.upper()}")
+        print(f"{'='*60}")
+        if not results:
+            print(f"❌ No items found")
+            logger.info(f"Query: top_with_items(aggregated {len(items)} items, {k}) - No results")
+            return
+        print(f"\n{'Rank':<6} {'Item':<30} {'Co-Purchases':<12}")
+        print(f"{'-'*48}")
+        for rank, (item_name, weight) in enumerate(results, 1):
+            print(f"{rank:<6} {item_name:<30} {int(weight):<12}")
+        logger.info(f"Query: aggregated top_with_items({len(items)} items, {k}) - {len(results)} results")
+    else:
+        item = items[0]
+        results = query_service.top_with_item(item, k)
+        if not results:
+            print(f"❌ No items found co-purchased with '{item}'")
+            logger.info(f"Query: top_with_item('{item}', {k}) - No results")
+            return
+        output = presenter.format_recommendations(results, item)
+        print("\n" + output)
+        logger.info(f"Query: top_with_item('{item}', {k}) - {len(results)} results")
 
 
 def query_top_bundles(query_service, presenter):
@@ -204,36 +258,52 @@ def query_pair_frequency(query_service, graph):
     # Find first item
     result1 = find_item_fuzzy(graph, item1_search)
     if isinstance(result1, list):
-        item1 = prompt_choose_item(result1, item1_search)
-        if item1 is None:
+        choice1 = prompt_choose_item(result1, item1_search)
+        if choice1 is None:
             return
+        items1 = choice1 if isinstance(choice1, list) else [choice1]
     elif result1 is None:
         print(f"❌ '{item1_search}' not found")
         logger.warning(f"Item not found: {item1_search}")
         return
     else:
-        item1 = result1
+        items1 = [result1]
 
     # Find second item
     result2 = find_item_fuzzy(graph, item2_search)
     if isinstance(result2, list):
-        item2 = prompt_choose_item(result2, item2_search)
-        if item2 is None:
+        choice2 = prompt_choose_item(result2, item2_search)
+        if choice2 is None:
             return
+        items2 = choice2 if isinstance(choice2, list) else [choice2]
     elif result2 is None:
         print(f"❌ '{item2_search}' not found")
         logger.warning(f"Item not found: {item2_search}")
         return
     else:
-        item2 = result2
+        items2 = [result2]
 
-    freq = query_service.pair_frequency(item1, item2)
-    if freq == 0:
-        print(f"❌ '{item1}' and '{item2}' were never purchased together")
-        logger.info(f"Query: pair_frequency('{item1}', '{item2}') - 0")
+    # Calculate frequency (for aggregated results, sum all pair frequencies)
+    total_freq = 0
+    for item1 in items1:
+        for item2 in items2:
+            total_freq += query_service.pair_frequency(item1, item2)
+    
+    if total_freq == 0:
+        items1_str = ", ".join(items1)
+        items2_str = ", ".join(items2)
+        print(f"❌ {items1_str} and {items2_str} were never purchased together")
+        logger.info(f"Query: pair_frequency(aggregated {len(items1)} × {len(items2)} pairs) - 0")
     else:
-        print(f"✅ '{item1}' and '{item2}' were purchased together {freq} times")
-        logger.info(f"Query: pair_frequency('{item1}', '{item2}') - {freq}")
+        if len(items1) == 1 and len(items2) == 1:
+            item1, item2 = items1[0], items2[0]
+            print(f"✅ '{item1}' and '{item2}' were purchased together {total_freq} times")
+            logger.info(f"Query: pair_frequency('{item1}', '{item2}') - {total_freq}")
+        else:
+            items1_str = ", ".join(items1)
+            items2_str = ", ".join(items2)
+            print(f"✅ ({items1_str}) and ({items2_str}) were purchased together {total_freq} times total")
+            logger.info(f"Query: pair_frequency(aggregated {len(items1)} × {len(items2)} pairs) - {total_freq}")
 
 
 def explore_related(query_service, graph, presenter):
@@ -248,16 +318,17 @@ def explore_related(query_service, graph, presenter):
     
     if isinstance(result, list):
         # Multiple matches - let user choose
-        item = prompt_choose_item(result, item_search)
-        if item is None:
+        choice = prompt_choose_item(result, item_search)
+        if choice is None:
             return
+        items = choice if isinstance(choice, list) else [choice]
     elif result is None:
         print(f"❌ '{item_search}' not found in dataset")
         logger.warning(f"Item not found: {item_search} (BFS)")
         return
     else:
         # Single exact match
-        item = result
+        items = [result]
 
     try:
         max_depth = int(input("Max exploration depth? (default 2): ") or "2")
@@ -270,23 +341,55 @@ def explore_related(query_service, graph, presenter):
         print("❌ Invalid numbers")
         return
 
-    results = query_service.bfs_related(item, max_depth, min_weight)
-    if not results or not any(results[item].values()):
-        print(f"❌ No related items found for '{item}' within {max_depth} degrees")
-        logger.info(f"Query: bfs_related('{item}', {max_depth}, {min_weight}) - No results")
-        return
-
-    print(f"\n📊 Items related to '{item}' (within {max_depth} degrees, min frequency {min_weight}):\n")
-    
-    # Print results by depth
-    total_items = 0
-    for depth in sorted(results[item].keys()):
-        items_at_depth = results[item][depth]
-        if items_at_depth:
+    # Handle aggregated results
+    if len(items) > 1:
+        # Aggregate BFS results from all items
+        aggregated_by_depth = {}
+        for item in items:
+            results = query_service.bfs_related(item, max_depth, min_weight)
+            if results and any(results[item].values()):
+                for depth, items_at_depth in results[item].items():
+                    if depth not in aggregated_by_depth:
+                        aggregated_by_depth[depth] = set()
+                    aggregated_by_depth[depth].update(items_at_depth)
+        
+        if not aggregated_by_depth:
+            items_str = ", ".join(items)
+            print(f"❌ No related items found for {items_str} within {max_depth} degrees")
+            logger.info(f"Query: bfs_related(aggregated {len(items)} items, {max_depth}, {min_weight}) - No results")
+            return
+        
+        items_str = ", ".join(items)
+        print(f"\n📊 Items related to ({items_str}) (within {max_depth} degrees, min frequency {min_weight}):\n")
+        
+        # Print results by depth
+        total_items = 0
+        for depth in sorted(aggregated_by_depth.keys()):
+            items_at_depth = aggregated_by_depth[depth]
             total_items += len(items_at_depth)
             print(f"  Degree {depth}: {', '.join(sorted(items_at_depth))}")
-    print()
-    logger.info(f"Query: bfs_related('{item}', {max_depth}, {min_weight}) - {total_items} items")
+        print()
+        logger.info(f"Query: bfs_related(aggregated {len(items)} items, {max_depth}, {min_weight}) - {total_items} items")
+    else:
+        # Single item BFS
+        item = items[0]
+        results = query_service.bfs_related(item, max_depth, min_weight)
+        if not results or not any(results[item].values()):
+            print(f"❌ No related items found for '{item}' within {max_depth} degrees")
+            logger.info(f"Query: bfs_related('{item}', {max_depth}, {min_weight}) - No results")
+            return
+
+        print(f"\n📊 Items related to '{item}' (within {max_depth} degrees, min frequency {min_weight}):\n")
+        
+        # Print results by depth
+        total_items = 0
+        for depth in sorted(results[item].keys()):
+            items_at_depth = results[item][depth]
+            if items_at_depth:
+                total_items += len(items_at_depth)
+                print(f"  Degree {depth}: {', '.join(sorted(items_at_depth))}")
+        print()
+        logger.info(f"Query: bfs_related('{item}', {max_depth}, {min_weight}) - {total_items} items")
 
 
 def load_dataset(csv_path):
