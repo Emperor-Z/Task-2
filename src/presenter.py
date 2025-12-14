@@ -49,4 +49,4 @@ class Presenter:
         Returns:
             Formatted string
         """
-        raise NotImplementedError("format_pair not implemented yet")
+        return f"{item_a} + {item_b}: {weight} co-purchases"
