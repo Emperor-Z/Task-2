@@ -6,11 +6,66 @@
 python main.py
 ```
 
+## Smart Item Matching
+
+The CLI includes intelligent item matching to make searches easier:
+
+### How It Works:
+
+1. **Type any part of an item name**
+   ```
+   Enter item name: bread
+   ```
+
+2. **If matches found, get a numbered menu:**
+   ```
+   📋 Found 3 items matching 'bread':
+   
+     1. brown bread
+     2. semi-finished bread
+     3. white bread
+     0. Cancel
+   
+   Select item number: 1
+   ```
+
+3. **System proceeds with your selection**
+   ```
+   How many top items? (default 10): 5
+   ============================================================
+   TOP ITEMS BOUGHT WITH: BROWN BREAD
+   ...
+   ```
+
+### Examples:
+
+**Partial Search (gets menu):**
+```
+Enter item name: bread
+→ Shows 3 options
+→ User picks one
+→ Continues with selection
+```
+
+**Exact Name:**
+```
+Enter item name: whole milk
+→ Exact match found
+→ Proceeds directly (no menu)
+```
+
+**No Matches:**
+```
+Enter item name: xyz
+→ ❌ 'xyz' not found in dataset
+```
+
 ## Features
 
 ### 1. **Find Items Bought With [ITEM]**
    - Search for the top N items most frequently co-purchased with a specific item
    - **Case-insensitive** - "whole milk", "WHOLE MILK", "Whole Milk" all work
+   - **Smart matching:** Type partial names and get options to choose from
    - Shows ranked results with co-purchase frequency
    - **Example:** Find top 5 items bought with "whole milk"
 
