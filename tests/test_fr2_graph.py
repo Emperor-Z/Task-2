@@ -25,6 +25,13 @@ class TestCooccurrenceGraph(unittest.TestCase):
         # Assert
         self.assertEqual(weight, 0, "Unseen pair should return weight 0")
 
+    def test_get_weight_handles_missing_items(self):
+        """FR2-T1b: get_weight returns 0 when either item missing."""
+        from src.cooccurrence_graph import CooccurrenceGraph
+        graph = CooccurrenceGraph()
+
+        self.assertEqual(graph.get_weight("bread", "missing"), 0)
+
     def test_update_creates_nodes_for_items(self):
         """FR2-T0: Update adds items to internal adjacency structure."""
         from src.cooccurrence_graph import CooccurrenceGraph
