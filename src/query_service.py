@@ -138,4 +138,28 @@ class QueryService:
                 }
             }
         """
-        raise NotImplementedError("bfs_related not implemented yet")
+        if start_item not in self.graph.graph:
+            return {start_item: {}}
+
+        result: Dict[str, Dict[int, Set[str]]] = {start_item: {}}
+        visited = {start_item}
+        queue = deque([(start_item, 0)])
+
+        while queue:
+            current_item, depth = queue.popleft()
+            if depth >= max_depth:
+                continue
+
+            neighbors = self.graph.neighbors(current_item)
+            for neighbor, weight in neighbors.items():
+                if neighbor in visited:
+                    continue
+                if weight < min_weight:
+                    continue
+
+                visited.add(neighbor)
+                next_depth = depth + 1
+                result[start_item].setdefault(next_depth, set()).add(neighbor)
+                queue.append((neighbor, next_depth))
+
+        return result
