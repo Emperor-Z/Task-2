@@ -69,6 +69,12 @@ class TestQueryService(unittest.TestCase):
         self.assertTrue(is_often_2, "weight 2 >= threshold 2")
         self.assertFalse(is_often_3_eggs, "weight 2 < threshold 3")
 
+    def test_often_copurchased_returns_false_for_missing_pair(self):
+        """FR3-T3a: Missing pair should not meet threshold."""
+        is_often = self.service.often_copurchased("milk", "butter", threshold=1)
+
+        self.assertFalse(is_often)
+
     # ========== FR5 Tests ==========
 
     def test_top_with_item_sorted_descending(self):
