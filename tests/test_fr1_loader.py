@@ -120,6 +120,20 @@ class TestTransactionLoader(unittest.TestCase):
             for item in basket:
                 self.assertIsInstance(item, str)
 
+    def test_duplicate_items_removed_within_same_basket(self):
+        """FR1-T3a: Loader removes duplicates inside a basket."""
+        csv_content = """Member_number,Date,itemDescription
+1808,21-07-2015,bread
+1808,21-07-2015,bread
+1808,21-07-2015,milk"""
+        csv_path = self._write_csv(csv_content)
+
+        from src.transaction_loader import TransactionLoader
+        loader = TransactionLoader()
+        baskets = loader.load_from_csv(csv_path)
+
+        self.assertEqual(baskets[0].count("bread"), 1)
+
     def test_deduplication_within_basket(self):
         """FR1-T3: Duplicate items in same basket are removed."""
         # Arrange
