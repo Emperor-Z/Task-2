@@ -39,7 +39,9 @@ class CooccurrenceGraph:
         Returns:
             Number of times items were co-purchased (0 if never/not exist)
         """
-        raise NotImplementedError("get_weight not implemented yet")
+        if item_a not in self.graph:
+            return 0
+        return self.graph[item_a].get(item_b, 0)
 
     def neighbors(self, item: str) -> Dict[str, int]:
         """Get all items bought with a given item and their co-purchase counts.
