@@ -25,7 +25,9 @@ class CooccurrenceGraph:
 
     def update_from_basket(self, basket: List[str]) -> None:
         """Update graph with co-occurrences from one basket (transaction)."""
-        raise NotImplementedError("update_from_basket not implemented yet")
+        for item in basket:
+            if item not in self.graph:
+                self.graph[item] = {}
 
     def get_weight(self, item_a: str, item_b: str) -> int:
         """Get co-purchase frequency for pair (item_a, item_b).
