@@ -100,6 +100,13 @@ class TestCooccurrenceGraph(unittest.TestCase):
                 f"Pair ({item_a}, {item_b}) should be symmetric"
             )
 
+    def test_neighbors_empty_for_missing_item(self):
+        """FR2-T5a: neighbors returns empty dict when item missing."""
+        from src.cooccurrence_graph import CooccurrenceGraph
+        graph = CooccurrenceGraph()
+
+        self.assertEqual(graph.neighbors("unknown"), {})
+
     def test_no_self_edges(self):
         """FR2-T4: Item paired with itself is not added (no self-edges)."""
         # Arrange
