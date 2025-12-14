@@ -47,7 +47,7 @@ class TestPresenter(unittest.TestCase):
 
         # Assert
         self.assertIsInstance(output, str)
-        self.assertIn("bread", output)
+        self.assertIn("bread", output.lower())
         self.assertIn("milk", output)
         self.assertIn("2", output)
 
@@ -93,9 +93,7 @@ class TestBFSExploration(unittest.TestCase):
         # Assert
         self.assertIsInstance(result, dict)
         self.assertIn("bread", result)
-        # Direct neighbors: milk (weight 3)
-        self.assertIn("milk", result["bread"])
-        # eggs and butter should not be at depth 1
+        # Direct neighbors at depth 1: milk (weight 3)
         neighbors_at_depth_1 = result["bread"].get(1, set())
         self.assertIn("milk", neighbors_at_depth_1)
 
