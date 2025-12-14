@@ -179,6 +179,20 @@ class TestTransactionLoader(unittest.TestCase):
         self.assertIn("milk", basket)
         self.assertNotIn("", basket)
 
+    def test_empty_after_strip_is_filtered(self):
+        """FR1-T4a: Items with whitespace-only names are dropped."""
+        csv_content = """Member_number,Date,itemDescription
+1808,21-07-2015,   
+1808,21-07-2015,bread"""
+        csv_path = self._write_csv(csv_content)
+
+        from src.transaction_loader import TransactionLoader
+        loader = TransactionLoader()
+        baskets = loader.load_from_csv(csv_path)
+
+        self.assertEqual(len(baskets[0]), 1)
+        self.assertEqual(baskets[0][0], "bread")
+
     def test_alphabetical_sorting(self):
         """FR1-T5: Items within baskets are sorted alphabetically (deterministic)."""
         # Arrange
