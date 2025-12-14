@@ -109,6 +109,17 @@ class TestQueryService(unittest.TestCase):
         # Assert
         self.assertEqual(top_items, [], "Missing item should return empty list")
 
+    def test_top_with_item_handles_zero_neighbors(self):
+        """FR5-T3a: Item with no neighbors returns empty list."""
+        from src.cooccurrence_graph import CooccurrenceGraph
+        from src.query_service import QueryService
+
+        graph = CooccurrenceGraph()
+        graph.update_from_basket(["solo"])
+        service = QueryService(graph)
+
+        self.assertEqual(service.top_with_item("solo", k=3), [])
+
     def test_top_with_item_tie_break_alphabetical(self):
         """FR5-T4: Tie-break by alphabetical order (secondary sort)."""
         # Arrange: Create graph with ties
