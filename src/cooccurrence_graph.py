@@ -25,9 +25,21 @@ class CooccurrenceGraph:
 
     def update_from_basket(self, basket: List[str]) -> None:
         """Update graph with co-occurrences from one basket (transaction)."""
-        for item in basket:
-            if item not in self.graph:
-                self.graph[item] = {}
+        for i in range(len(basket)):
+            for j in range(i + 1, len(basket)):
+                item_a = basket[i]
+                item_b = basket[j]
+
+                if item_a == item_b:
+                    continue
+
+                if item_a not in self.graph:
+                    self.graph[item_a] = {}
+                if item_b not in self.graph:
+                    self.graph[item_b] = {}
+
+                self.graph[item_a][item_b] = self.graph[item_a].get(item_b, 0) + 1
+                self.graph[item_b][item_a] = self.graph[item_b].get(item_a, 0) + 1
 
     def get_weight(self, item_a: str, item_b: str) -> int:
         """Get co-purchase frequency for pair (item_a, item_b).
