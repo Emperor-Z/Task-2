@@ -163,6 +163,15 @@ class TestQueryService(unittest.TestCase):
             self.assertNotIn(pair, pairs_set, f"Pair {pair} appears twice")
             pairs_set.add(pair)
 
+    def test_top_bundles_empty_graph_returns_empty(self):
+        """FR4-T0: top_bundles on empty graph returns []."""
+        from src.cooccurrence_graph import CooccurrenceGraph
+        from src.query_service import QueryService
+
+        empty_service = QueryService(CooccurrenceGraph())
+
+        self.assertEqual(empty_service.top_bundles(k=5), [])
+
     def test_top_bundles_sorted_descending(self):
         """FR4-T2: Bundles sorted by weight descending."""
         # Act
