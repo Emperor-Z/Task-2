@@ -59,6 +59,14 @@ class TestPresenter(unittest.TestCase):
         self.assertIn("milk", output)
         self.assertIn("2", output)
 
+    def test_format_recommendations_includes_header(self):
+        """FR6-T2a: Output includes header text."""
+        items = [("tea", 1)]
+
+        output = self.presenter.format_recommendations(items, "bread")
+
+        self.assertIn("TOP ITEMS", output)
+
     def test_format_handles_empty_results(self):
         """FR6-T3: Format handles empty results gracefully."""
         # Act
