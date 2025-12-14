@@ -24,4 +24,11 @@ class TransactionLoader:
         if not os.path.exists(filepath):
             raise FileNotFoundError(f"CSV file not found: {filepath}")
 
-        return []
+        with open(filepath, "r", encoding="utf-8", newline="") as f:
+            reader = csv.DictReader(f)
+            required_columns = {"Member_number", "Date", "itemDescription"}
+            if not required_columns.issubset(reader.fieldnames or []):
+                missing = required_columns - set(reader.fieldnames or [])
+                raise ValueError(f"CSV missing required column: {missing}")
+
+            return []
