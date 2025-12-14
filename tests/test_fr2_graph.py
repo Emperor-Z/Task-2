@@ -25,6 +25,16 @@ class TestCooccurrenceGraph(unittest.TestCase):
         # Assert
         self.assertEqual(weight, 0, "Unseen pair should return weight 0")
 
+    def test_update_creates_nodes_for_items(self):
+        """FR2-T0: Update adds items to internal adjacency structure."""
+        from src.cooccurrence_graph import CooccurrenceGraph
+        graph = CooccurrenceGraph()
+
+        graph.update_from_basket(["bread", "milk"])
+
+        self.assertIn("bread", graph.graph)
+        self.assertIn("milk", graph.graph)
+
     def test_basket_increments_both_directions(self):
         """FR2-T2: Basket [A, B] increments both A→B and B→A (symmetry)."""
         # Arrange
