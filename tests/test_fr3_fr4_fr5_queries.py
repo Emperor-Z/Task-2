@@ -39,6 +39,12 @@ class TestQueryService(unittest.TestCase):
         # Assert
         self.assertEqual(freq, 0, "Never co-purchased pair should return 0")
 
+    def test_pair_frequency_zero_when_item_not_in_graph(self):
+        """FR3-T1a: Unknown item returns 0 frequency."""
+        freq = self.service.pair_frequency("unknown_item", "bread")
+
+        self.assertEqual(freq, 0)
+
     def test_pair_frequency_returns_correct_count(self):
         """FR3-T2: Known pair returns correct count."""
         # Act
