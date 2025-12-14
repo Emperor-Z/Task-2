@@ -107,6 +107,13 @@ class TestCooccurrenceGraph(unittest.TestCase):
 
         self.assertEqual(graph.neighbors("unknown"), {})
 
+    def test_unique_edges_empty_when_graph_empty(self):
+        """FR2-T6a: unique_edges returns empty list for empty graph."""
+        from src.cooccurrence_graph import CooccurrenceGraph
+        graph = CooccurrenceGraph()
+
+        self.assertEqual(graph.unique_edges(), [])
+
     def test_no_self_edges(self):
         """FR2-T4: Item paired with itself is not added (no self-edges)."""
         # Arrange
