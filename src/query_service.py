@@ -74,7 +74,12 @@ class QueryService:
             1. Frequency descending
             2. Item name alphabetically (tie-breaker)
         """
-        raise NotImplementedError("top_with_item not implemented yet")
+        neighbors = self.graph.neighbors(item)
+        if not neighbors:
+            return []
+
+        sorted_items = sorted(neighbors.items(), key=lambda x: (-x[1], x[0]))
+        return sorted_items[:k]
 
     # ========== FR4: Top-K Bundles (Pairs) Globally ==========
 
