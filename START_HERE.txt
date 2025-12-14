@@ -1,0 +1,285 @@
+================================================================================
+                    MARKET BASKET ANALYSIS - TASK 2
+                         START HERE GUIDE
+================================================================================
+
+PROJECT STATUS: Phase 0 ✅ COMPLETE — Ready for Phase 1
+
+Date: December 14, 2025
+Repository: /home/z/Downloads/PAI/Assesment ind/Task 2
+
+================================================================================
+                         QUICK START (5 MIN READ)
+================================================================================
+
+1. PROJECT OVERVIEW
+   ─────────────────
+   
+   Goal: Implement a market basket analysis system using a weighted undirected
+   graph to identify co-purchased items in supermarket transactions.
+
+   Key Questions (FRs):
+   • Q1: Which items are most frequently bought together with bread?
+   • Q2: What are the top 3 most common product bundles?
+   • Q3: How can we quickly check if two items are often co-purchased?
+
+   Design: Pure weighted undirected graph (adjacency list via nested dicts)
+   Data: CSV with ~9,835 supermarket transactions
+   Tests: unittest framework (Python stdlib)
+
+
+2. FILE GUIDE
+   ──────────
+
+   📍 MOST IMPORTANT (Read First):
+   
+   • START_HERE.txt (this file)
+   • PHASE_0_SUMMARY.md — What just happened + next steps
+   • MASTER_CHECKLIST.md — Complete TODO list for all 9 phases
+   
+   📍 REFERENCE DOCUMENTS:
+   
+   • CONTEXT_ENHANCED.md — Complete design document (sections 1-11)
+   • DATA_FORMAT_GUIDE.md — Phase 1 implementation guide with examples
+   • README.md — Quick project overview
+   
+   📍 CODE:
+   
+   • src/ — Production code (empty, ready for Phase 1)
+   • tests/ — Unit tests (only smoke test so far)
+   • data/ — Input CSV (already present)
+   • benchmarks/ — Performance measurements (Phase 8)
+   
+
+3. GIT HISTORY (So Far)
+   ──────────────────────
+
+   Commit 1: Scaffold repository structure + smoke test
+   Commit 2: Add comprehensive documentation
+   
+   View with: git log --oneline
+
+
+4. CURRENT TEST STATUS
+   ──────────────────
+
+   ✅ 3/3 smoke tests passing
+   
+   Run with: python -m unittest discover tests/ -v
+
+
+5. NEXT STEP: Start Phase 1
+   ────────────────────────
+
+   Phase 1 = FR1 (Transaction Loading)
+   
+   a) Write 6 failing tests in tests/test_fr1_loader.py
+      - CSV parsing, grouping, deduplication, sorting, filtering
+   
+   b) Implement TransactionLoader class in src/transaction_loader.py
+      - Make all 6 tests pass
+   
+   c) Commit both files with professional messages
+   
+   For detailed guidance, see:
+   - MASTER_CHECKLIST.md (Phase 1 section)
+   - DATA_FORMAT_GUIDE.md (test examples + implementation hints)
+
+
+6. DESIGN DECISIONS (Locked)
+   ──────────────────────────
+
+   ✓ Data Structure: Weighted Undirected Graph (NOT trees)
+   ✓ UI: Text-based CLI (NOT HTML/CSS)
+   ✓ Tie-Breaking: Frequency (desc), then Alphabetical
+   ✓ Dependencies: Stdlib only (no pandas/numpy)
+   ✓ Data Scope: Entire CSV dataset
+   ✓ TDD Cadence: Write tests → Commit failing → Implement → Commit passing
+   ✓ Git Messages: Professional format (Summary/Why/What)
+
+
+7. KEY PRINCIPLES (Remember These)
+   ────────────────────────────────
+
+   • Pure Graph: Single data structure, no hybrid approaches
+   • TDD: Always write tests first, commit failing, then implement
+   • Professional: Clear commits, good docstrings, SOLID principles
+   • Deterministic: Tie-break rules ensure reproducible results
+   • Quantitative: All NFRs measurable (< 50ms, >= 1000 tx/sec, etc.)
+   
+
+8. TIME ESTIMATES
+   ────────────────
+
+   Phase 1 (FR1 - Loading):          2-3 hours
+   Phase 2 (FR2/8 - Graph):          2-3 hours
+   Phase 3-5 (FR3-5 - Queries):      2-3 hours
+   Phase 6 (FR7 - BFS):              1-2 hours (optional)
+   Phase 7 (FR6 - CLI):              1-2 hours
+   Phase 8 (Benchmarks):             1 hour
+   Phase 9 (Report + Cleanup):       1-2 hours
+   
+   Total: 11-16 hours (realistic estimate)
+
+
+9. COMMIT FREQUENCY
+   ──────────────────
+
+   Expected: 1 commit per test file + 1 commit per implementation
+   Target Total: ~25 commits in final repository
+
+
+10. HOW TO GET STARTED RIGHT NOW
+    ─────────────────────────────
+
+    Step 1: Read PHASE_0_SUMMARY.md (5 minutes)
+    Step 2: Read DATA_FORMAT_GUIDE.md (10 minutes)
+    Step 3: Read MASTER_CHECKLIST.md Phase 1 section (5 minutes)
+    Step 4: Create tests/test_fr1_loader.py with 6 failing tests
+    Step 5: Run tests: python -m unittest tests.test_fr1_loader -v
+    Step 6: Implement src/transaction_loader.py
+    Step 7: Run tests again (should all pass)
+    Step 8: Commit both files with professional message
+    Step 9: Move to Phase 2
+
+
+================================================================================
+                         COMMAND REFERENCE
+================================================================================
+
+# Run all tests (shows pass/fail count)
+python -m unittest discover tests/ -v
+
+# Run specific test file
+python -m unittest tests.test_fr1_loader -v
+
+# Run specific test case
+python -m unittest tests.test_fr1_loader.TestTransactionLoader.test_load_csv -v
+
+# Check git log
+git log --oneline
+
+# Stage and commit (after writing tests or code)
+git add .
+git commit -m "test(...): ..." or "feat(...): ..."
+
+# View changed files
+git status
+
+
+================================================================================
+                         CRITICAL REMINDERS
+================================================================================
+
+❗ WRITE TESTS FIRST — always!
+   Tests must fail before implementing.
+   Example: def test_load_csv(self): ... should raise AssertionError
+
+❗ COMMIT BOTH — test file AND implementation
+   test(FR1): ... add failing tests
+   feat(FR1): ... implement feature
+   
+   Never commit tests without implementation, and vice versa.
+
+❗ FOLLOW FORMAT — professional commit messages
+   test(FRx): [description]
+   feat(FRx): [description]
+   
+   Include summary + why + what in message.
+
+❗ DETERMINISM — always sort, always trim, always deduplicate
+   Items in baskets must be sorted alphabetically.
+   Tie-breaks must be alphabetical (after frequency).
+   
+❗ NO EXTERNAL LIBRARIES — use only Python stdlib
+   csv, collections, unittest are fine.
+   No pandas, numpy, scipy, etc.
+
+
+================================================================================
+                         DEBUGGING TIPS
+================================================================================
+
+If tests fail during Phase 1:
+
+1. Check CSV parsing:
+   - Is CSV file readable?
+   - Are column names correct? (Member_number, Date, itemDescription)
+   - Are items being extracted correctly?
+
+2. Check grouping:
+   - Are items grouped by BOTH Member_number AND Date?
+   - Is the grouping key (Member_number, Date) correct?
+
+3. Check deduplication:
+   - Use set() to automatically deduplicate
+   - Convert back to list for sorting
+
+4. Check sorting:
+   - Use sorted() or list.sort()
+   - Verify alphabetical order
+
+5. Debug with print statements:
+   - Print what you're reading from CSV
+   - Print basket before and after sorting
+   - Print final list of baskets
+
+
+================================================================================
+                         FINAL CHECKLIST (Before Submission)
+================================================================================
+
+Code:
+  ☐ All 32+ tests passing
+  ☐ No PEP 8 violations
+  ☐ Type hints on all functions
+  ☐ Docstrings on all public methods
+  ☐ No unused imports
+
+Architecture:
+  ☐ SRP: Each class has one responsibility
+  ☐ Composition used correctly
+  ☐ No circular dependencies
+
+Git:
+  ☐ ~25 clean commits total
+  ☐ Professional commit messages
+  ☐ No "WIP" or "fixup" in final history
+  ☐ git log looks professional
+
+Documentation:
+  ☐ README.md complete
+  ☐ CONTEXT_ENHANCED.md detailed
+  ☐ Code comments explain why
+  ☐ Report outline prepared
+
+Performance:
+  ☐ NFR1: < 50 ms pair lookup
+  ☐ NFR2: >= 1000 tx/sec ingestion
+  ☐ NFR3: < 1 sec top-K queries
+  ☐ NFR4: 100% accuracy
+
+Report:
+  ☐ 750-1000 words
+  ☐ Design justification
+  ☐ Complexity analysis
+  ☐ Alternatives discussed
+  ☐ Scalability evaluated
+  ☐ Evidence (benchmarks) included
+
+
+================================================================================
+                         CONTACT / REFERENCE
+================================================================================
+
+If stuck:
+  1. Check CONTEXT_ENHANCED.md for design details
+  2. Check DATA_FORMAT_GUIDE.md for Phase 1 examples
+  3. Check MASTER_CHECKLIST.md for specific phase requirements
+  4. Check git log to see what commits look like
+  5. Review existing test file (test_smoke.py) for test structure
+
+
+Good luck! You're ready to start Phase 1. 🚀
+
+================================================================================
