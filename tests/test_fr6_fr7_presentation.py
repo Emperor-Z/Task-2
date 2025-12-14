@@ -37,6 +37,14 @@ class TestPresenter(unittest.TestCase):
         self.assertIn("milk", output)
         self.assertIn("2", output)  # weight should appear
 
+    def test_format_top_bundles_includes_rank_header(self):
+        """FR6-T1a: Output includes rank column header."""
+        bundles = [("a", "b", 1)]
+
+        output = self.presenter.format_top_bundles(bundles)
+
+        self.assertIn("Rank", output)
+
     def test_format_recommendations_returns_string(self):
         """FR6-T2: Format recommendations returns readable string output."""
         # Arrange
