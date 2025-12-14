@@ -44,4 +44,4 @@ class TransactionLoader:
                 key = (member_number, date)
                 baskets_dict[key].add(item)
 
-            return [list(items) for items in baskets_dict.values()]
+            return [sorted(list(items)) for items in baskets_dict.values()]
