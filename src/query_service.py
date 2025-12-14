@@ -1,11 +1,13 @@
-"""FR3, FR4, FR5: Query service for market basket analysis.
+"""FR3, FR4, FR5, FR7: Query service for market basket analysis.
 
 FR3: Pair frequency lookup and co-purchase threshold check
 FR4: Top-K item pairs (bundles) ranked by frequency
 FR5: Top-K items bought with a given item (recommendations)
+FR7: BFS exploration with filters (min_weight, max_depth)
 """
 
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Set
+from collections import deque
 from src.cooccurrence_graph import CooccurrenceGraph
 
 
@@ -119,3 +121,74 @@ class QueryService:
         )
         
         return sorted_edges[:k]
+
+    # ========== FR7: BFS Exploration ==========
+
+    def bfs_related(
+        self,
+        start_item: str,
+        max_depth: int = 2,
+        min_weight: int = 1
+    ) -> Dict[str, Dict[int, Set[str]]]:
+        """Explore items related to a start item via BFS (breadth-first search).
+        
+        Uses BFS to explore item relationships at multiple hops, with filters:
+        - max_depth: Maximum hop distance (1 = direct neighbors only)
+        - min_weight: Minimum co-purchase frequency to traverse an edge
+        
+        Prevents infinite loops with visited set tracking.
+        
+        Args:
+            start_item: Item to explore from
+            max_depth: Maximum relationship depth (hops)
+            min_weight: Minimum edge weight to traverse
+        
+        Returns:
+            Dictionary structure:
+            {
+                start_item: {
+                    1: {items at distance 1},
+                    2: {items at distance 2},
+                    ...
+                }
+            }
+        """
+        if start_item not in self.graph.graph:
+            return {start_item: {}}
+        
+        result = {start_item: {}}
+        visited = {start_item}
+        queue = deque([(start_item, 0)])  # (item, depth)
+        
+        while queue:
+            current_item, current_depth = queue.popleft()
+            
+            # Stop exploring if reached max depth
+            if current_depth >= max_depth:
+                continue
+            
+            # Get neighbors of current item
+            neighbors = self.graph.neighbors(current_item)
+            
+            for neighbor_item, weight in neighbors.items():
+                # Skip if already visited
+                if neighbor_item in visited:
+                    continue
+                
+                # Skip if weight below threshold
+                if weight < min_weight:
+                    continue
+                
+                # Mark as visited
+                visited.add(neighbor_item)
+                
+                # Record at this depth
+                next_depth = current_depth + 1
+                if next_depth not in result[start_item]:
+                    result[start_item][next_depth] = set()
+                result[start_item][next_depth].add(neighbor_item)
+                
+                # Add to queue for exploration
+                queue.append((neighbor_item, next_depth))
+        
+        return result
