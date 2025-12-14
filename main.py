@@ -58,18 +58,59 @@ def print_menu():
 
 
 def find_item_fuzzy(graph, search_term):
-    """Find item in graph (case-insensitive, fuzzy match)."""
+    """Find item in graph (case-insensitive, fuzzy match).
+    
+    Returns:
+        - Single item string if exact match found
+        - List of items if partial matches found
+        - None if no matches found
+    """
     search_lower = search_term.lower().strip()
-    all_items = list(graph.graph.keys())
+    all_items = sorted(list(graph.graph.keys()))
     
     # Exact match (case-insensitive)
     for item in all_items:
         if item.lower() == search_lower:
             return item
     
-    # Partial match
+    # Partial match - sorted for consistency
     matches = [item for item in all_items if search_lower in item.lower()]
     return matches if matches else None
+
+
+def prompt_choose_item(matches, search_term):
+    """Prompt user to choose from multiple matching items.
+    
+    Args:
+        matches: List of matching item names
+        search_term: Original search term
+        
+    Returns:
+        Selected item name or None if user cancels
+    """
+    print(f"\n📋 Found {len(matches)} items matching '{search_term}':\n")
+    
+    for i, item in enumerate(matches, 1):
+        print(f"  {i}. {item}")
+    
+    print(f"  0. Cancel\n")
+    
+    while True:
+        try:
+            choice = input("Select item number: ").strip()
+            choice_num = int(choice)
+            
+            if choice_num == 0:
+                print("❌ Cancelled")
+                return None
+            elif 1 <= choice_num <= len(matches):
+                selected = matches[choice_num - 1]
+                logger.info(f"User selected: {selected} (from {len(matches)} matches for '{search_term}')")
+                return selected
+            else:
+                print(f"❌ Please enter 0-{len(matches)}")
+        except ValueError:
+            print("❌ Please enter a valid number")
 
 
 def list_available_items(graph):
@@ -94,17 +135,20 @@ def query_top_items(query_service, graph, presenter):
         return
 
     # Find item (case-insensitive)
-    item = find_item_fuzzy(graph, item_search)
-    if isinstance(item, list):
-        print(f"\n❌ '{item_search}' not found. Did you mean?")
-        for match in item[:5]:
-            print(f"   • {match}")
-        logger.warning(f"Item not found: {item_search} (suggested: {', '.join(item[:5])})")
-        return
-    elif item is None:
+    result = find_item_fuzzy(graph, item_search)
+    
+    if isinstance(result, list):
+        # Multiple matches - let user choose
+        item = prompt_choose_item(result, item_search)
+        if item is None:
+            return
+    elif result is None:
         print(f"❌ '{item_search}' not found in dataset")
         logger.warning(f"Item not found: {item_search}")
         return
+    else:
+        # Single exact match
+        item = result
 
     try:
         k = int(input("How many top items? (default 10): ") or "10")
@@ -157,19 +201,31 @@ def query_pair_frequency(query_service, graph):
         print("❌ Both item names are required")
         return
 
-    # Find items (case-insensitive)
-    item1 = find_item_fuzzy(graph, item1_search)
-    item2 = find_item_fuzzy(graph, item2_search)
-
-    if isinstance(item1, list) or item1 is None:
+    # Find first item
+    result1 = find_item_fuzzy(graph, item1_search)
+    if isinstance(result1, list):
+        item1 = prompt_choose_item(result1, item1_search)
+        if item1 is None:
+            return
+    elif result1 is None:
         print(f"❌ '{item1_search}' not found")
         logger.warning(f"Item not found: {item1_search}")
         return
-    
-    if isinstance(item2, list) or item2 is None:
+    else:
+        item1 = result1
+
+    # Find second item
+    result2 = find_item_fuzzy(graph, item2_search)
+    if isinstance(result2, list):
+        item2 = prompt_choose_item(result2, item2_search)
+        if item2 is None:
+            return
+    elif result2 is None:
         print(f"❌ '{item2_search}' not found")
         logger.warning(f"Item not found: {item2_search}")
         return
+    else:
+        item2 = result2
 
     freq = query_service.pair_frequency(item1, item2)
     if freq == 0:
@@ -188,17 +244,20 @@ def explore_related(query_service, graph, presenter):
         return
 
     # Find item (case-insensitive)
-    item = find_item_fuzzy(graph, item_search)
-    if isinstance(item, list):
-        print(f"\n❌ '{item_search}' not found. Did you mean?")
-        for match in item[:5]:
-            print(f"   • {match}")
-        logger.warning(f"Item not found: {item_search} (BFS)")
-        return
-    elif item is None:
+    result = find_item_fuzzy(graph, item_search)
+    
+    if isinstance(result, list):
+        # Multiple matches - let user choose
+        item = prompt_choose_item(result, item_search)
+        if item is None:
+            return
+    elif result is None:
         print(f"❌ '{item_search}' not found in dataset")
         logger.warning(f"Item not found: {item_search} (BFS)")
         return
+    else:
+        # Single exact match
+        item = result
 
     try:
         max_depth = int(input("Max exploration depth? (default 2): ") or "2")
