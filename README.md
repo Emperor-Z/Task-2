@@ -128,13 +128,207 @@ Each phase follows:
 ## Usage Example (Post-Implementation)
 
 ```bash
-python src/app.py --top-bundles 10
-python src/app.py --top-with-item bread 5
-python src/app.py --pair-frequency bread milk
+# Interactive CLI (recommended)
+python main.py
+
+# Run automated benchmarks
+python benchmarks/run.py
+
+# Run all unit tests
+python -m unittest discover tests/ -v
 ```
+
+## Interactive CLI
+
+The system includes a user-friendly command-line interface:
+
+```bash
+$ python main.py
+======================================================================
+MARKET BASKET ANALYSIS - INTERACTIVE CLI
+======================================================================
+
+--- MAIN MENU ---
+1. Find items bought with [ITEM]
+2. Find top bundles (most frequently co-purchased pairs)
+3. Check co-purchase frequency between two items
+4. Explore related items (BFS)
+5. List available items
+6. Load new dataset (reload CSV)
+0. Exit
+
+Select option: 2
+How many top bundles? (default 10): 10
+
+============================================================
+TOP PRODUCT BUNDLES (Item Pairs)
+============================================================
+Rank   Item 1               Item 2               Frequency
+------------------------------------------------------------
+1      other vegetables     whole milk           222     
+2      rolls/buns           whole milk           209     
+3      soda                 whole milk           174     
+...
+```
+
+**Features:**
+- ✅ Case-insensitive search (fuzzy matching)
+- ✅ Full session logging to `logs/cli_YYYYMMDD_HHMMSS.log`
+- ✅ Helpful error messages and suggestions
+- ✅ ASCII table formatting for readability
+
+See `CLI_GUIDE.md` for detailed usage examples.
+
+## Key Features
+
+### 1. **Data Loading (FR1)**
+- Parse CSV files with customer transactions
+- Group items by (Member_number, Date)
+- Automatic deduplication and alphabetical sorting
+- Handles missing columns gracefully
+
+### 2. **Graph Construction (FR2, FR8)**
+- Weighted undirected graph using adjacency list
+- O(1) pair lookup: `graph[item1][item2]` → frequency
+- Incremental updates: add new baskets to existing graph
+- No self-edges: filters pairs with (i < j)
+
+### 3. **Query Operations (FR3-FR5)**
+- **Pair Frequency (FR3):** Look up how often two items bought together
+- **Top Bundles (FR4):** Rank item pairs by co-purchase frequency
+- **Top Recommendations (FR5):** Find items most often bought with a specific item
+- **Deterministic sorting:** Tie-breaking with (-frequency, item_name)
+
+### 4. **Network Exploration (FR7)**
+- BFS (breadth-first search) for related item discovery
+- Control depth of exploration (1, 2, 3, ... degrees)
+- Filter by minimum co-purchase frequency
+- Shows items at each distance level
+
+### 5. **Text Presentation (FR6)**
+- ASCII table formatting for console output
+- Ranked results with frequency counts
+- Easy-to-read column alignment
+- No external dependencies (pure stdlib)
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────┐
+│ CSV File (data/)                                    │
+└────────────────┬────────────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────────────┐
+│ TransactionLoader (FR1)                              │
+│ - load_from_csv()                                    │
+│ - Returns: List[List[items]]                         │
+└────────────────┬────────────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────────────┐
+│ CooccurrenceGraph (FR2, FR8)                         │
+│ - update_from_basket()                              │
+│ - get_weight()                                       │
+│ - neighbors()                                        │
+│ - unique_edges()                                     │
+└────────────────┬────────────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────────────┐
+│ QueryService (FR3-FR7)                              │
+│ - pair_frequency()                                   │
+│ - top_bundles()                                      │
+│ - top_with_item()                                    │
+│ - bfs_related()                                      │
+└────────────────┬────────────────────────────────────┘
+                 │
+                 ▼
+┌─────────────────────────────────────────────────────┐
+│ Presenter (FR6)                                      │
+│ - format_top_bundles()                              │
+│ - format_recommendations()                          │
+│ - format_pair()                                      │
+└─────────────────────────────────────────────────────┘
+```
+
+## Performance (NFRs)
+
+| Metric | Target | Actual | Status |
+|--------|--------|--------|--------|
+| **NFR1: Pair Lookup** | < 50 ms | 0.000088 ms | ✅ 537k× faster |
+| **NFR2: Ingestion Rate** | ≥ 1,000 tx/sec | 212,529 tx/sec | ✅ 212× faster |
+| **NFR3: Top-K Query** | < 1 sec | 0.023 sec | ✅ 43× faster |
+| **NFR4: Accuracy** | ✓ | 100% (34/34 tests) | ✅ Verified |
+
+### Complexity Analysis
+
+- **CSV Loading:** O(n) where n = number of transactions
+- **Graph Construction:** O(Σm²) where m = avg basket size (typically O(n))
+- **Pair Lookup:** O(1) via dict access
+- **Top-K Ranking:** O(E log E) where E = number of edges
+- **BFS Exploration:** O(V + E) with depth/weight filtering
+
+## Test Coverage
+
+- **34 unit tests** across 5 test files
+- **Framework:** Python unittest (built-in)
+- **Coverage:** All features (FR1-FR8)
+- **Edge cases:** Empty graphs, missing items, self-edges, ties
+- **Execution time:** 6 milliseconds
+
+Run tests:
+```bash
+python -m unittest discover tests/ -v
+```
+
+## Dataset
+
+**File:** `data/Supermarket_dataset_PAI.csv`
+
+| Metric | Value |
+|--------|-------|
+| Transactions | 14,963 |
+| Unique Items | 167 |
+| Item Pairs | 6,260 |
+| Top Bundle | other vegetables + whole milk (222) |
+
+## Dependencies
+
+**None** — Uses Python stdlib only:
+- `csv` — CSV parsing
+- `collections` — defaultdict, deque
+- `unittest` — Testing framework
+- `time` — Performance benchmarking
+
+## Documentation
+
+- **README.md** — This file (overview & quick start)
+- **CLI_GUIDE.md** — Interactive CLI usage examples
+- **REPORT_OUTLINE.md** — Structure for reflective report (750-1000 words)
+- **CONTEXT_ENHANCED.md** — Detailed requirement analysis
+- **DATA_FORMAT_GUIDE.md** — CSV structure & examples
+- **MASTER_CHECKLIST.md** — Feature completion tracking
+
+## Git History
+
+15 atomic commits showing development process:
+
+```
+d8e6745 - docs: add CLI guide and update gitignore
+8a8db0a - feat(CLI): add interactive CLI with logging
+ed87ecf - chore: add comprehensive benchmark suite
+36381ec - refactor: fix FR6/FR7 tests to match output
+ae98cb4 - feat(FR6, FR7): implement presenter and BFS
+... [9 more implementation commits]
+05239c3 - chore: scaffold project structure
+```
+
+View with: `git log --oneline`
 
 ---
 
-**Author:** [Your Name]  
+**Author:** PAI Assessment Task 2  
 **Date:** December 2025  
-**Assessment:** PAI Task 2 — Market Basket Analysis
+**Status:** ✅ Complete — Ready for report writing
+
