@@ -74,4 +74,16 @@ class CooccurrenceGraph:
             List of (item_a, item_b, weight) tuples where item_a < item_b (lexicographic).
             This ensures each pair appears only once (no duplicates).
         """
-        raise NotImplementedError("unique_edges not implemented yet")
+        edges: List[Tuple[str, str, int]] = []
+        seen = set()
+
+        for item_a, neighbors in self.graph.items():
+            for item_b, weight in neighbors.items():
+                pair = tuple(sorted([item_a, item_b]))
+                if pair in seen:
+                    continue
+
+                seen.add(pair)
+                edges.append((pair[0], pair[1], weight))
+
+        return edges
