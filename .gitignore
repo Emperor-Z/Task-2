@@ -8,6 +8,10 @@ env/
 venv/
 ENV/
 build/
+
+# Logs
+logs/
+*.log
 develop-eggs/
 dist/
 downloads/
