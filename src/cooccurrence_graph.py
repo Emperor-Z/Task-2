@@ -65,7 +65,7 @@ class CooccurrenceGraph:
             Dictionary mapping neighbor items to co-purchase frequency.
             Empty dict if item not in graph.
         """
-        raise NotImplementedError("neighbors not implemented yet")
+        return self.graph.get(item, {})
 
     def unique_edges(self) -> List[Tuple[str, str, int]]:
         """Return all unique edges in graph (avoiding A-B and B-A duplicates).
