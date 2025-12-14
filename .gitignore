@@ -6,8 +6,10 @@ __pycache__/
 .Python
 env/
 venv/
+.venv/
 ENV/
 build/
+.mypy_cache/
 
 # Logs
 logs/
@@ -43,6 +45,11 @@ htmlcov/
 # OS
 .DS_Store
 Thumbs.db
+.python-version
+
+# Local databases
+*.sqlite3
+*.db
 
 # Project-specific (report draft)
 REPORT_OUTLINE.md
