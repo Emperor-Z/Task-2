@@ -17,23 +17,36 @@ The CLI includes intelligent item matching to make searches easier:
    Enter item name: bread
    ```
 
-2. **If matches found, get a numbered menu:**
+2. **If matches found, get a numbered menu with aggregation option:**
    ```
    📋 Found 3 items matching 'bread':
    
      1. brown bread
      2. semi-finished bread
      3. white bread
+     all. Show results for ALL items
      0. Cancel
    
-   Select item number: 1
+   Select item number (or 'all'): 
    ```
 
-3. **System proceeds with your selection**
+3. **Choose an option:**
+   - **Enter 1, 2, or 3:** See results for that specific item
+   - **Type 'all':** Aggregate results across all matching items
+   - **Enter 0 or 'cancel':** Cancel the operation
+
+4. **Example with 'all' option:**
    ```
+   Select item number (or 'all'): all
    How many top items? (default 10): 5
    ============================================================
-   TOP ITEMS BOUGHT WITH: BROWN BREAD
+   TOP 5 ITEMS BOUGHT WITH: BROWN BREAD, SEMI-FINISHED BREAD, WHITE BREAD
+   ============================================================
+   Rank   Item                           Co-Purchases
+   ------------------------------------------------
+   1      whole milk                     139
+   2      other vegetables               100
+   3      rolls/buns                     93
    ...
    ```
 
@@ -66,8 +79,10 @@ Enter item name: xyz
    - Search for the top N items most frequently co-purchased with a specific item
    - **Case-insensitive** - "whole milk", "WHOLE MILK", "Whole Milk" all work
    - **Smart matching:** Type partial names and get options to choose from
+   - **NEW: Aggregation mode** - Select "all" to combine results across all matching items
    - Shows ranked results with co-purchase frequency
-   - **Example:** Find top 5 items bought with "whole milk"
+   - **Example 1:** Find top 5 items bought with "whole milk" (single item)
+   - **Example 2:** Find top 5 items bought with ANY bread type (aggregated)
 
 ### 2. **Find Top Bundles**
    - See the most frequently co-purchased item pairs
@@ -77,16 +92,20 @@ Enter item name: xyz
 
 ### 3. **Check Co-Purchase Frequency**
    - Query specific pairs: "How many times were these two items bought together?"
-   - **Case-insensitive matching** with suggestions
+   - **Case-insensitive matching** with suggestions for both items
+   - **NEW: Multi-item aggregation** - Select "all" for both items to sum frequencies
    - Exact count returned
-   - **Example:** Frequency of "bread" and "butter"
+   - **Example 1:** Frequency of "bread" and "butter" (single pair)
+   - **Example 2:** Total frequency of (ANY bread type) × (ANY milk type) (aggregated)
 
 ### 4. **Explore Related Items (BFS)**
    - Navigate the co-purchase network by depth
    - Control exploration depth (1, 2, 3, ...)
    - Filter by minimum co-purchase frequency
+   - **NEW: Multi-item exploration** - Select "all" to explore network from all matching items
    - Shows items at each degree of separation
-   - **Example:** Find all items related to "milk" within 2 degrees, frequency ≥ 2
+   - **Example 1:** Find items related to "milk" within 2 degrees (single start point)
+   - **Example 2:** Find items related to ANY bread type within 2 degrees (aggregated)
 
 ### 5. **List Available Items**
    - View all 167 items in the dataset
