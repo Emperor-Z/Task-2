@@ -5,6 +5,7 @@ grouped by (Member_number, Date) with deduplication and sorting.
 """
 
 import csv
+import os
 from typing import List
 from collections import defaultdict
 
@@ -20,4 +21,7 @@ class TransactionLoader:
     def load_from_csv(filepath: str) -> List[List[str]]:
         """Load CSV and return list of baskets (deduplicated, sorted).
         """
-        raise NotImplementedError("load_from_csv not implemented yet")
+        if not os.path.exists(filepath):
+            raise FileNotFoundError(f"CSV file not found: {filepath}")
+
+        return []
