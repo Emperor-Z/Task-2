@@ -305,10 +305,7 @@ python -m unittest discover tests/ -v
 
 - **README.md** — This file (overview & quick start)
 - **CLI_GUIDE.md** — Interactive CLI usage examples
-- **REPORT_OUTLINE.md** — Structure for reflective report (750-1000 words)
-- **CONTEXT_ENHANCED.md** — Detailed requirement analysis
-- **DATA_FORMAT_GUIDE.md** — CSV structure & examples
-- **MASTER_CHECKLIST.md** — Feature completion tracking
+
 
 ## Git History
 
