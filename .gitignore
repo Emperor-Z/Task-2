@@ -54,3 +54,7 @@ Thumbs.db
 # Project-specific (report draft)
 REPORT_OUTLINE.md
 benchmarks/results.txt
+
+# Markdown (ignore all except README.md)
+*.md
+!README.md
