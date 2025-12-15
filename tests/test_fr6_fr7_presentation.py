@@ -5,6 +5,8 @@ FR7: BFS traversal with filters (min_weight, max_depth)
 """
 
 import unittest
+import tempfile
+import os
 
 
 class TestPresenter(unittest.TestCase):
@@ -87,6 +89,19 @@ class TestPresenter(unittest.TestCase):
         self.assertIsInstance(text, str)
         self.assertIn("bread", text)
         self.assertIn("milk", text)
+
+    def test_plot_top_bundles_outputs_png(self):
+        """FR6-T5: Plotting bundles writes a PNG file."""
+        edges = self.graph.unique_edges()
+        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
+            output_path = tmp.name
+        try:
+            self.presenter.plot_graph(edges, output_path, max_edges=5)
+            self.assertTrue(os.path.exists(output_path))
+            self.assertGreater(os.path.getsize(output_path), 0)
+        finally:
+            if os.path.exists(output_path):
+                os.unlink(output_path)
 
 
 class TestBFSExploration(unittest.TestCase):
